@@ -9,9 +9,12 @@ if [[ ! -d $1 ]]; then
 	echo "cloned to, e.g. ~/kicad/lib/"
 	exit 1
 fi
+
+command -v jq >/dev/null 2>&1 || { echo >&2 "jq commmand is required to run this, install it first."; exit 1; }
+
 cd $1
 
-repos=`curl 'https://api.github.com/users/KiCad/repos?per_page=10000' | jq '.[] | select(.name | test(".pretty")) | .name, .clone_url'`
+repos=`curl 'https://api.github.com/users/KiCad/repos?per_page=10000' | jq '.[] | .name, .clone_url' | grep .pretty`
 readarray -t reposArray <<<"$repos"
 i=0
 n=${#reposArray[@]}
